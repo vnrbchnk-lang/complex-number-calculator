@@ -4,7 +4,7 @@ obj/
 .vs/
 *.user
 *.suo
-
+.claude/
 ## Сборка и кеши
 [Dd]ebug/
 [Rr]elease/
