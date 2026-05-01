@@ -1,0 +1,20 @@
+## Visual Studio / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+## Сборка и кеши
+[Dd]ebug/
+[Rr]elease/
+*.cache
+*.log
+
+## IDE
+.idea/
+.vscode/
+
+## OS
+.DS_Store
+Thumbs.db
