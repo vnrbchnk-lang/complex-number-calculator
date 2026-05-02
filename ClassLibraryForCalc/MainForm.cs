@@ -49,14 +49,14 @@ public partial class MainForm : Form, ICalculatorUI
         Application.Run(this);
     }
 
-    void OpClick(object? sender, EventArgs e)
+    public void OpClick(object? sender, EventArgs e)
     {
         Button b = (Button)sender!;
         operation = (string)b.Tag!;
         opLabel.Text = "Выбрано: " + operation;
     }
 
-    void CalcClick(object? sender, EventArgs e)
+    public void CalcClick(object? sender, EventArgs e)
     {
         if (ReadOperation() == "")
         {
