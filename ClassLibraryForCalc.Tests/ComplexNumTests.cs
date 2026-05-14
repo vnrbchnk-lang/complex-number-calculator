@@ -155,5 +155,57 @@ namespace ClassLibraryForCalc.Tests
             Assert.AreEqual(4.0, r.RPart);
             Assert.AreEqual(-1.5, r.ImPart);
         }
+
+        [TestMethod]
+        public void Test23_SubtractZero()
+        {
+            ComplexNum a = new ComplexNum(5, 2);
+            ComplexNum b = new ComplexNum(0, 0);
+            IComplexNumber r = a.Minus(b);
+            Assert.AreEqual(5, r.RPart);
+            Assert.AreEqual(2, r.ImPart);
+        }
+
+        [TestMethod]
+        public void Test24_DivideZeroByNumber()
+        {
+            ComplexNum a = new ComplexNum(0, 0);
+            ComplexNum b = new ComplexNum(2, 3);
+            IComplexNumber r = a.Delen(b);
+            Assert.AreEqual(0, r.RPart);
+            Assert.AreEqual(0, r.ImPart);
+        }
+
+        [TestMethod]
+        public void Test25_DivideEqualNumbers()
+        {
+            ComplexNum a = new ComplexNum(3, 5);
+            ComplexNum b = new ComplexNum(3, 5);
+            IComplexNumber r = a.Delen(b);
+            Assert.AreEqual(1, r.RPart);
+            Assert.AreEqual(0, r.ImPart);
+        }
+
+        [TestMethod]
+        public void Test26_BiggerOrEqualModulus()
+        {
+            ComplexNum a = new ComplexNum(3, 4);
+            ComplexNum b = new ComplexNum(-4, -3);
+            Assert.IsTrue(a.BiggerOrEqual(b));
+        }
+
+        [TestMethod]
+        public void Test27_ToStringPositiveImaginary()
+        {
+            ComplexNum z = new ComplexNum(2, 3);
+            Assert.AreEqual("2 + 3i", z.ToString());
+        }
+
+        [TestMethod]
+        public void Test28_ToStringNegativeImaginary()
+        {
+            ComplexNum z = new ComplexNum(2, -3);
+            Assert.AreEqual("2 - 3i", z.ToString());
+        }
     }
 }
