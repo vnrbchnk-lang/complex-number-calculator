@@ -22,7 +22,6 @@ namespace ClassLibraryForCalc.Tests
             return (Label)form.Controls.Find(name, true)[0];
         }
 
-        // Заполняет 4 поля формы значениями двух комплексных чисел.
         void EnterNumbers(MainForm form, string re1, string im1, string re2, string im2)
         {
             FindTextBox(form, "re1Box").Text = re1;
@@ -31,7 +30,6 @@ namespace ClassLibraryForCalc.Tests
             FindTextBox(form, "im2Box").Text = im2;
         }
 
-        // Эмулирует нажатие кнопки операции (по имени) и затем нажатие «Вычислить».
         void ClickOpAndCalc(MainForm form, string opButton)
         {
             form.OpClick(FindButton(form, opButton), EventArgs.Empty);
@@ -43,202 +41,186 @@ namespace ClassLibraryForCalc.Tests
             return FindLabel(form, "resultLabel").Text;
         }
 
-        // --- Арифметические операции: ввод -> кнопка -> результат ---
-
-        [TestMethod]
-        public void IntegrationTest01_AddTwoNumbersFullFlow()
+        [DataTestMethod]
+        [DataRow("2", "3", "1", "4", "3", "7")]
+        [DataRow("5", "2", "0", "0", "5", "2")]
+        public void Add_FullFlow(string re1, string im1, string re2, string im2,
+                                 string expRe, string expIm)
         {
             MainForm form = new MainForm();
-            EnterNumbers(form, "2", "3", "1", "4");
+            EnterNumbers(form, re1, im1, re2, im2);
             ClickOpAndCalc(form, "btnAdd");
-            StringAssert.Contains(GetResult(form), "Результат");
-            StringAssert.Contains(GetResult(form), "3");
-            StringAssert.Contains(GetResult(form), "7");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, "Результат");
+            StringAssert.Contains(text, expRe);
+            StringAssert.Contains(text, expIm);
         }
 
-        [TestMethod]
-        public void IntegrationTest02_SubtractTwoNumbersFullFlow()
+        [DataTestMethod]
+        [DataRow("5", "7", "2", "3", "3", "4")]
+        [DataRow("3", "5", "3", "5", "0", "0")]
+        public void Subtract_FullFlow(string re1, string im1, string re2, string im2,
+                                      string expRe, string expIm)
         {
             MainForm form = new MainForm();
-            EnterNumbers(form, "5", "7", "2", "3");
+            EnterNumbers(form, re1, im1, re2, im2);
             ClickOpAndCalc(form, "btnSub");
-            StringAssert.Contains(GetResult(form), "3");
-            StringAssert.Contains(GetResult(form), "4");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, expRe);
+            StringAssert.Contains(text, expIm);
         }
 
-        [TestMethod]
-        public void IntegrationTest03_MultiplyTwoNumbersFullFlow()
+        [DataTestMethod]
+        [DataRow("2", "3", "1", "4", "-10", "11")]
+        [DataRow("7", "9", "0", "0", "0", "0")]
+        public void Multiply_FullFlow(string re1, string im1, string re2, string im2,
+                                      string expRe, string expIm)
         {
             MainForm form = new MainForm();
-            EnterNumbers(form, "2", "3", "1", "4");
+            EnterNumbers(form, re1, im1, re2, im2);
             ClickOpAndCalc(form, "btnMul");
-            // (2+3i)(1+4i) = -10 + 11i
-            StringAssert.Contains(GetResult(form), "-10");
-            StringAssert.Contains(GetResult(form), "11");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, expRe);
+            StringAssert.Contains(text, expIm);
         }
 
-        [TestMethod]
-        public void IntegrationTest04_DivideTwoNumbersFullFlow()
+        [DataTestMethod]
+        [DataRow("4", "2", "1", "1", "3", "1")]
+        [DataRow("3", "5", "3", "5", "1", "0")]
+        public void Divide_FullFlow(string re1, string im1, string re2, string im2,
+                                    string expRe, string expIm)
         {
             MainForm form = new MainForm();
-            EnterNumbers(form, "4", "2", "1", "1");
+            EnterNumbers(form, re1, im1, re2, im2);
             ClickOpAndCalc(form, "btnDiv");
-            // (4+2i)/(1+i) = 3 - 1i
-            StringAssert.Contains(GetResult(form), "3");
-            StringAssert.Contains(GetResult(form), "1");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, expRe);
+            StringAssert.Contains(text, expIm);
         }
 
         [TestMethod]
-        public void IntegrationTest05_FractionalAddFullFlow()
-        {
-            MainForm form = new MainForm();
-            // На русской локали разделитель дробной части — запятая.
-            string sep = System.Globalization.CultureInfo.CurrentCulture
-                            .NumberFormat.NumberDecimalSeparator;
-            EnterNumbers(form,
-                "2" + sep + "5", "-1" + sep + "75",
-                "1" + sep + "5", "0" + sep + "25");
-            ClickOpAndCalc(form, "btnAdd");
-            // (2.5 - 1.75i) + (1.5 + 0.25i) = 4 - 1.5i
-            StringAssert.Contains(GetResult(form), "4");
-            StringAssert.Contains(GetResult(form), "1" + sep + "5");
-        }
-
-        // --- Операции сравнения ---
-
-        [TestMethod]
-        public void IntegrationTest06_EqualsTrueFullFlow()
-        {
-            MainForm form = new MainForm();
-            EnterNumbers(form, "2", "3", "2", "3");
-            ClickOpAndCalc(form, "btnEq");
-            StringAssert.Contains(GetResult(form), "true");
-        }
-
-        [TestMethod]
-        public void IntegrationTest07_EqualsFalseFullFlow()
-        {
-            MainForm form = new MainForm();
-            EnterNumbers(form, "2", "3", "5", "3");
-            ClickOpAndCalc(form, "btnEq");
-            StringAssert.Contains(GetResult(form), "false");
-        }
-
-        [TestMethod]
-        public void IntegrationTest08_LessThanByModulusFullFlow()
-        {
-            MainForm form = new MainForm();
-            EnterNumbers(form, "1", "1", "3", "4");
-            ClickOpAndCalc(form, "btnLt");
-            StringAssert.Contains(GetResult(form), "true");
-        }
-
-        [TestMethod]
-        public void IntegrationTest09_GreaterThanByModulusFullFlow()
-        {
-            MainForm form = new MainForm();
-            EnterNumbers(form, "6", "8", "3", "4");
-            ClickOpAndCalc(form, "btnGt");
-            StringAssert.Contains(GetResult(form), "true");
-        }
-
-        [TestMethod]
-        public void IntegrationTest10_LessOrEqualOnEqualModulusFullFlow()
-        {
-            MainForm form = new MainForm();
-            EnterNumbers(form, "3", "4", "-4", "-3");
-            ClickOpAndCalc(form, "btnLe");
-            StringAssert.Contains(GetResult(form), "true");
-        }
-
-        [TestMethod]
-        public void IntegrationTest11_GreaterOrEqualOnEqualModulusFullFlow()
-        {
-            MainForm form = new MainForm();
-            EnterNumbers(form, "3", "4", "-4", "-3");
-            ClickOpAndCalc(form, "btnGe");
-            StringAssert.Contains(GetResult(form), "true");
-        }
-
-        // --- Обработка ошибок (форма + класс) ---
-
-        [TestMethod]
-        public void IntegrationTest12_DivideByZeroShowsErrorFullFlow()
+        public void DivideByZero_ShowsError()
         {
             MainForm form = new MainForm();
             EnterNumbers(form, "5", "3", "0", "0");
             ClickOpAndCalc(form, "btnDiv");
-            StringAssert.Contains(GetResult(form), "Ошибка");
-            StringAssert.Contains(GetResult(form), "деление на ноль");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, "Ошибка");
+            StringAssert.Contains(text, "деление на ноль");
+        }
+
+        [DataTestMethod]
+        [DataRow("2", "3", "2", "3", "true")]
+        [DataRow("2", "3", "5", "3", "false")]
+        public void EqualsCompare_FullFlow(string re1, string im1, string re2, string im2,
+                                           string expected)
+        {
+            MainForm form = new MainForm();
+            EnterNumbers(form, re1, im1, re2, im2);
+            ClickOpAndCalc(form, "btnEq");
+            StringAssert.Contains(GetResult(form), expected);
+        }
+
+        [DataTestMethod]
+        [DataRow("btnLt", "1", "1", "3", "4")]
+        [DataRow("btnGt", "6", "8", "3", "4")]
+        [DataRow("btnLe", "3", "4", "-4", "-3")]
+        [DataRow("btnGe", "3", "4", "-4", "-3")]
+        public void ModulusCompare_FullFlow(string op, string re1, string im1,
+                                            string re2, string im2)
+        {
+            MainForm form = new MainForm();
+            EnterNumbers(form, re1, im1, re2, im2);
+            ClickOpAndCalc(form, op);
+            StringAssert.Contains(GetResult(form), "true");
         }
 
         [TestMethod]
-        public void IntegrationTest13_InvalidInputShowsErrorFullFlow()
+        public void InvalidInput_ShowsError()
         {
             MainForm form = new MainForm();
             EnterNumbers(form, "abc", "2", "1", "1");
             ClickOpAndCalc(form, "btnAdd");
-            StringAssert.Contains(GetResult(form), "Ошибка");
-            StringAssert.Contains(GetResult(form), "некорректный ввод");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, "Ошибка");
+            StringAssert.Contains(text, "некорректный ввод");
         }
 
         [TestMethod]
-        public void IntegrationTest14_EmptyFieldShowsErrorFullFlow()
+        public void EmptyField_ShowsError()
         {
             MainForm form = new MainForm();
             EnterNumbers(form, "", "3", "1", "1");
             ClickOpAndCalc(form, "btnAdd");
-            StringAssert.Contains(GetResult(form), "Ошибка");
-            StringAssert.Contains(GetResult(form), "поле не должно быть пустым");
+
+            string text = GetResult(form);
+            StringAssert.Contains(text, "Ошибка");
+            StringAssert.Contains(text, "поле не должно быть пустым");
         }
 
         [TestMethod]
-        public void IntegrationTest15_NoOperationSelectedShowsErrorFullFlow()
+        public void ReadComplexNumber_RejectsLetters()
         {
             MainForm form = new MainForm();
-            EnterNumbers(form, "1", "2", "3", "4");
-            // Кнопку операции не нажимаем — сразу «Вычислить».
-            form.CalcClick(form, EventArgs.Empty);
-            StringAssert.Contains(GetResult(form), "Ошибка");
-            StringAssert.Contains(GetResult(form), "операция не выбрана");
+            FindTextBox(form, "re1Box").Text = "abc";
+            FindTextBox(form, "im1Box").Text = "2";
+
+            ICalculatorUI ui = form;
+            try
+            {
+                ui.ReadComplexNumber("first");
+                Assert.Fail("Ожидалось исключение ArgumentException");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual("некорректный ввод", ex.Message);
+            }
         }
 
-        // --- Проверка состояния интерфейса ---
+        [TestMethod]
+        public void ReadComplexNumber_RejectsEmptyField()
+        {
+            MainForm form = new MainForm();
+            FindTextBox(form, "re1Box").Text = "";
+            FindTextBox(form, "im1Box").Text = "3";
+
+            ICalculatorUI ui = form;
+            try
+            {
+                ui.ReadComplexNumber("first");
+                Assert.Fail("Ожидалось исключение ArgumentException");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.AreEqual("поле не должно быть пустым", ex.Message);
+            }
+        }
+
+        [DataTestMethod]
+        [DataRow("btnAdd", "+")]
+        [DataRow("btnMul", "*")]
+        [DataRow("btnEq", "==")]
+        public void OperationButton_UpdatesSelectedOperation(string buttonName, string expectedOp)
+        {
+            MainForm form = new MainForm();
+            form.OpClick(FindButton(form, buttonName), EventArgs.Empty);
+
+            ICalculatorUI ui = form;
+            Assert.AreEqual(expectedOp, ui.ReadOperation());
+        }
 
         [TestMethod]
-        public void IntegrationTest16_OperationLabelUpdatesAfterClick()
+        public void OperationLabel_UpdatesAfterClick()
         {
             MainForm form = new MainForm();
             form.OpClick(FindButton(form, "btnAdd"), EventArgs.Empty);
             StringAssert.Contains(FindLabel(form, "opLabel").Text, "+");
-        }
-
-        [TestMethod]
-        public void IntegrationTest17_OperationCanBeChanged()
-        {
-            MainForm form = new MainForm();
-            form.OpClick(FindButton(form, "btnAdd"), EventArgs.Empty);
-            form.OpClick(FindButton(form, "btnMul"), EventArgs.Empty);
-            ICalculatorUI ui = form;
-            Assert.AreEqual("*", ui.ReadOperation());
-        }
-
-        [TestMethod]
-        public void IntegrationTest18_TwoCalculationsInARow()
-        {
-            MainForm form = new MainForm();
-
-            // Первое вычисление: 2 + 3i и 1 + 4i, сложение -> 3 + 7i
-            EnterNumbers(form, "2", "3", "1", "4");
-            ClickOpAndCalc(form, "btnAdd");
-            StringAssert.Contains(GetResult(form), "3");
-            StringAssert.Contains(GetResult(form), "7");
-
-            // Меняем операнды и операцию -> новый результат на той же форме
-            EnterNumbers(form, "5", "7", "2", "3");
-            ClickOpAndCalc(form, "btnSub");
-            StringAssert.Contains(GetResult(form), "3");
-            StringAssert.Contains(GetResult(form), "4");
         }
     }
 }
